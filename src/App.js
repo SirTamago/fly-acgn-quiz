@@ -12,13 +12,14 @@ import {
     BookOpen,
     Eye,
     Lock,
-    Unlock,
     RotateCcw,
     Save,
     ListChecks,
 } from "lucide-react";
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
+import questions from "./questions.json";
+import baseHints from "./hints.json";
 
 // --- Types ---
 /**
@@ -46,78 +47,34 @@ function uid() {
 
 // --- LocalStorage helpers ---
 const LS_KEY = "ipquiz.questions.v1";
+const LS_HINTS = "ipquiz.hints.v1";
 const LS_PIN = "ipquiz.admin.pin";
 
 function loadQuestions() {
-    const raw = localStorage.getItem(LS_KEY);
-    if (!raw) return demoSeed();
-    try {
-        const arr = JSON.parse(raw);
-        if (Array.isArray(arr)) return arr;
-    } catch (e) {}
-    return demoSeed();
+    return questions;
 }
 function saveQuestions(arr) {
     localStorage.setItem(LS_KEY, JSON.stringify(arr));
+}
+function loadHints() {
+    try {
+        const s = localStorage.getItem(LS_HINTS);
+        if (s) {
+            const fromLS = JSON.parse(s);
+            // merge: file defaults + local overrides
+            return { ...(baseHints || {}), ...(fromLS || {}) };
+        }
+    } catch {}
+    return baseHints || {};
+}
+function saveHints(obj) {
+    localStorage.setItem(LS_HINTS, JSON.stringify(obj || {}));
 }
 function getAdminPin() {
     return localStorage.getItem(LS_PIN) || "1234"; // default pin
 }
 function setAdminPin(pin) {
     localStorage.setItem(LS_PIN, pin);
-}
-
-// --- Demo seed data ---
-function demoSeed() {
-    const q = [
-        {
-            id: uid(),
-            ip: "霓虹偶像",
-            type: "mcq",
-            level: "b",
-            title: "Cyalume 最常见的中文俗称是？",
-            options: ["荧光棒", "夜明珠", "手电筒", "电子烟"],
-            correctIndex: 0,
-        },
-        {
-            id: uid(),
-            ip: "霓虹偶像",
-            type: "short",
-            level: "a",
-            title:
-                "简答：简述 wotagei 的核心节奏特点（可用要点形式）。",
-            reference: "要点示例：8 拍循环；call & response；高抬手；队形变换。",
-        },
-        {
-            id: uid(),
-            ip: "科幻阅读",
-            type: "reading",
-            level: "c",
-            title:
-                "阅读：\n\n> 人类登上了一颗被称为‘拂晓’的潮汐锁定行星……\n\n问题：请概述潮汐锁定对昼夜与气候的影响（2-3 点）。",
-            reference:
-                "参考要点：昼夜半球固定；昏线温差适中；大气循环极端；宜居带在晨昏圈。",
-        },
-        {
-            id: uid(),
-            ip: "动画 IP",
-            type: "fill",
-            level: "b",
-            title: "填空：\n\n**NSYC** 可被戏拟为一句口号：Never Stop Your _______",
-            reference: "Cyalume",
-        },
-        {
-            id: uid(),
-            ip: "动画 IP",
-            type: "mcq",
-            level: "s",
-            title: "选择：下列哪一项**不**属于常见应援色？",
-            options: ["水蓝", "樱粉", "柠黄", "潘通 448C"],
-            correctIndex: 3,
-        },
-    ];
-    localStorage.setItem(LS_KEY, JSON.stringify(q));
-    return q;
 }
 
 // --- UI Primitives (Tailwind) ---
@@ -171,6 +128,7 @@ function Tag({ children, tone = "gray" }) {
 export default function App() {
     const [tab, setTab] = useState("welcome"); // welcome | quiz | admin
     const [questions, setQuestions] = useState(() => loadQuestions());
+    const [hints, setHints] = useState(() => loadHints()); // { [ip: string]: string }
     const [selectedIP, setSelectedIP] = useState("");
     const [basket, setBasket] = useState([]); // selected question ids before start
     const [phase, setPhase] = useState("pick"); // pick | running | confirm | finished
@@ -181,8 +139,15 @@ export default function App() {
     useEffect(() => {
         saveQuestions(questions);
     }, [questions]);
+    useEffect(() => {
+        saveHints(hints);
+    }, [hints]);
 
-    const ips = useMemo(() => Array.from(new Set(questions.map((q) => q.ip))).sort(), [questions]);
+    const ips = useMemo(() => {
+        const set = new Set(questions.map((q) => q.ip));
+        Object.keys(hints || {}).forEach((ip) => set.add(ip));
+        return Array.from(set).sort();
+    }, [questions, hints]);
 
     const perIPCounts = useMemo(() => {
         const m = {};
@@ -274,7 +239,7 @@ export default function App() {
                     <BookOpen className="w-6 h-6" />
                     <h1 className="text-lg font-semibold">IP 主题测验 · Demo</h1>
                     <div className="ml-auto flex items-center gap-2">
-                        <Tag tone="violet">总计可选 5 题；每个 IP ≤ 2 题</Tag>
+                        <Tag tone="blue">总计可选 5 题；每个 IP ≤ 2 题</Tag>
                         <Button onClick={() => setTab("welcome")} className={`${tab === "welcome" ? "bg-gray-900 text-white" : ""}`}>欢迎</Button>
                         <Button onClick={() => setTab("quiz")} className={`${tab === "quiz" ? "bg-gray-900 text-white" : ""}`}>答题</Button>
                         <Button onClick={() => setTab("admin")} className={`${tab === "admin" ? "bg-gray-900 text-white" : ""}`}>管理员</Button>
@@ -329,20 +294,6 @@ export default function App() {
                                     <ListChecks className="w-4 h-4 inline -mt-0.5" /> 完成并查看总分
                                 </Button>
                             )}
-
-                            <div className="mt-2 flex items-center gap-2">
-                                <Input
-                                    placeholder="管理员 PIN（默认 1234）"
-                                    value={pinInput}
-                                    onChange={(e) => setPinInput(e.target.value)}
-                                    type="password"
-                                />
-                                {adminMode ? (
-                                    <Tag tone="green"><Unlock className="w-3 h-3 inline" /> 管理员已启用</Tag>
-                                ) : (
-                                    <Button onClick={tryAdmin}><Lock className="w-4 h-4 inline" /> 解锁评分</Button>
-                                )}
-                            </div>
                         </div>
                     </Card>
                 </aside>
@@ -350,9 +301,10 @@ export default function App() {
                 {/* Main content */}
                 <section className="col-span-12 md:col-span-8 lg:col-span-9 space-y-4">
                     {tab === "welcome" && <Welcome />}
-                    {tab === "quiz" && (
+            {tab === "quiz" && (
                         <QuizArea
                             questions={questions}
+                hints={hints}
                             selectedIP={selectedIP}
                             basket={basket}
                             setBasket={setBasket}
@@ -365,12 +317,28 @@ export default function App() {
                             scoreSummary={scoreSummary}
                         />
                     )}
-                    {tab === "admin" && (
+                    {tab === "admin" && adminMode ? (
                         <AdminArea
                             questions={questions}
                             setQuestions={setQuestions}
+                hints={hints}
+                setHints={setHints}
                             onSetPin={setAdminPin}
+                            selectedIP={selectedIP}
                         />
+                    ) : tab === "admin" && (
+                        <Card>
+                            <h3 className="font-semibold mb-2">管理员登录</h3>
+                            <div className="flex items-center gap-2">
+                                <Input
+                                    placeholder="管理员 PIN"
+                                    value={pinInput}
+                                    onChange={(e) => setPinInput(e.target.value)}
+                                    type="password"
+                                />
+                                <Button onClick={tryAdmin}><Lock className="w-4 h-4 inline" /> 解锁</Button>
+                            </div>
+                        </Card>
                     )}
                 </section>
             </main>
@@ -396,7 +364,8 @@ function Welcome() {
 }
 
 function QuizArea({
-  questions,
+    questions,
+    hints,
   selectedIP,
   basket,
   setBasket,
@@ -409,14 +378,20 @@ function QuizArea({
   scoreSummary,
 }) {
   const [expandedQuestion, setExpandedQuestion] = useState(null);
+  const [specialHint, setSpecialHint] = useState("");
 
-  const visibleQuestions = useMemo(() => {
-    if (phase === "pick") {
-      return questions.filter((q) => !selectedIP || q.ip === selectedIP);
-    }
-    // running/confirm/finished: only chosen ones
-    return questions.filter((q) => basket.includes(q.id));
-  }, [questions, selectedIP, basket, phase]);
+  useEffect(() => {
+        // Load special hint for the selected IP from hints map
+        setSpecialHint((hints && selectedIP && hints[selectedIP]) || "");
+    }, [selectedIP, hints]);
+
+    const visibleQuestions = useMemo(() => {
+        const list = phase === "pick"
+            ? questions.filter((q) => !selectedIP || q.ip === selectedIP)
+            : questions.filter((q) => basket.includes(q.id));
+        // exclude any legacy info-type items if they exist
+        return list.filter((q) => q.type !== "info");
+    }, [questions, selectedIP, basket, phase]);
 
   function setAnswer(qid, data) {
     setAnswers((prev) => ({ ...prev, [qid]: { ...(prev[qid] || {}), ...data } }));
@@ -441,6 +416,13 @@ function QuizArea({
           </div>
         </div>
       )}
+
+            {specialHint && (
+                <div className="p-3 bg-yellow-100 border border-yellow-300 rounded-lg">
+                    <h4 className="font-semibold text-yellow-800">提示</h4>
+                    <p className="text-yellow-700 whitespace-pre-line">{specialHint}</p>
+                </div>
+            )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         {visibleQuestions.map((q) => (
@@ -504,7 +486,6 @@ function QuizArea({
                   q={q}
                   ans={answers[q.id]}
                   setAns={(data) => setAnswer(q.id, data)}
-                  adminMode={adminMode}
                   showReference={phase === "confirm" || phase === "finished"}
                 />
               </div>
@@ -512,6 +493,29 @@ function QuizArea({
           </Card>
         ))}
       </div>
+
+      {phase === "finished" && (
+        <div className="p-4 rounded-xl border bg-white shadow">
+          <h3 className="text-lg font-semibold">总分</h3>
+          <p className="text-gray-700">总得分：{scoreSummary.total} 分</p>
+          <div className="mt-2">
+            <h4 className="font-medium">按 IP 分数</h4>
+            <ul className="list-disc pl-5 text-sm text-gray-600">
+              {Object.entries(scoreSummary.byIP).map(([ip, score]) => (
+                <li key={ip}>{ip}: {score} 分</li>
+              ))}
+            </ul>
+          </div>
+          <div className="mt-2">
+            <h4 className="font-medium">按等级分数</h4>
+            <ul className="list-disc pl-5 text-sm text-gray-600">
+              {Object.entries(scoreSummary.byLevel).map(([level, score]) => (
+                <li key={level}>{LEVEL_LABEL[level]}: {score} 分</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -552,10 +556,13 @@ function MCQBlock({ q, ans, setAns }) {
     );
 }
 
-function ManualBlock({ q, ans, setAns, adminMode, showReference }) {
+function ManualBlock({ q, ans, setAns, showReference }) {
     const pts = LEVEL_POINTS[q.level];
     const manual = ans?.manualScore;
-    const choices = [0, Math.ceil(pts * 0.5), pts];
+
+    // Define scoring options based on question type
+    const choices = q.type === "fill" ? [0, pts] : Array.from({ length: pts + 1 }, (_, i) => i);
+
     return (
         <div className="space-y-2">
             <div className="text-sm text-gray-600">此题需管理员评分。</div>
@@ -563,11 +570,10 @@ function ManualBlock({ q, ans, setAns, adminMode, showReference }) {
                 {choices.map((p) => (
                     <Button
                         key={p}
-                        disabled={!adminMode}
                         onClick={() => setAns({ manualScore: p })}
                         className={`${manual === p ? "bg-gray-900 text-white" : ""}`}
                     >
-                        评分 {p} 分
+                        {p} 分
                     </Button>
                 ))}
             </div>
@@ -583,24 +589,23 @@ function ManualBlock({ q, ans, setAns, adminMode, showReference }) {
     );
 }
 
-function AdminArea({ questions, setQuestions, onSetPin }) {
-    const [form, setForm] = useState({
-        id: "",
-        ip: "",
-        type: "mcq",
-        level: "b",
-        title: "",
-        options: ["", "", "", ""],
-        correctIndex: 0,
-        reference: "",
-    });
-
-    const [pin, setPin] = useState(getAdminPin());
-    const [ips, setIps] = useState(() => Array.from(new Set(questions.map((q) => q.ip))));
+function AdminArea({ questions, setQuestions, hints, setHints, selectedIP }) {
+    const [form, setForm] = useState(null); // null indicates no editing
     const [newIp, setNewIp] = useState("");
+    const [specialHint, setSpecialHint] = useState(() => (selectedIP ? (hints?.[selectedIP] || "") : ""));
+
+    useEffect(() => {
+        setSpecialHint(selectedIP ? (hints?.[selectedIP] || "") : "");
+    }, [selectedIP, hints]);
 
     function resetForm() {
-        setForm({ id: "", ip: "", type: "mcq", level: "b", title: "", options: ["", "", "", ""], correctIndex: 0, reference: "" });
+        setForm({ id: "", ip: selectedIP || "", type: "mcq", level: "b", title: "", options: ["", "", "", ""], correctIndex: 0, reference: "" });
+    }
+
+    function saveSpecialHint() {
+        if (!selectedIP) return alert("请先选择一个 IP 分类");
+        setHints((prev) => ({ ...(prev || {}), [selectedIP]: specialHint }));
+        alert("特殊提示已保存");
     }
 
     function saveQuestion() {
@@ -616,15 +621,7 @@ function AdminArea({ questions, setQuestions, onSetPin }) {
             payload.id = uid();
             setQuestions((prev) => [payload, ...prev]);
         }
-        resetForm();
-    }
-
-    function addNewIp() {
-        if (!newIp.trim()) return alert("IP 名称不能为空");
-        if (ips.includes(newIp)) return alert("IP 名称已存在");
-        setIps((prev) => [...prev, newIp]);
-        setNewIp("");
-        setForm((prev) => ({ ...prev, ip: newIp }));
+        setForm(null);
     }
 
     function deleteQuestion(id) {
@@ -633,129 +630,57 @@ function AdminArea({ questions, setQuestions, onSetPin }) {
         }
     }
 
-    /*
-    function deleteIp(ip) {
-        setIps((prev) => prev.filter((i) => i !== ip));
-        setQuestions((prev) => prev.filter((q) => q.ip !== ip));
-        if (form.ip === ip) setForm((prev) => ({ ...prev, ip: "" }));
+    function addNewIp() {
+        const name = newIp.trim();
+        if (!name) return alert("IP 名称不能为空");
+        const exists = questions.some((q) => q.ip === name) || !!hints?.[name];
+        if (exists) return alert("IP 名称已存在");
+        // create empty hint entry for the new IP
+        setHints((prev) => ({ ...(prev || {}), [name]: "" }));
+        setNewIp("");
     }
-    */
-   
+
+    const filteredQuestions = useMemo(() => {
+        const arr = selectedIP ? questions.filter((q) => q.ip === selectedIP) : questions;
+        // hide any legacy info-type items in admin list
+        return arr.filter((q) => q.type !== "info");
+    }, [questions, selectedIP]);
+
     return (
-        <div className="space-y-4">
+        <div className="space-y-4 relative">
             <Card>
-                <h3 className="font-semibold mb-2">管理员设置</h3>
+                <h3 className="font-semibold mb-2">添加新 IP</h3>
                 <div className="flex items-center gap-2">
-                    <Input value={pin} onChange={(e) => setPin(e.target.value)} placeholder="管理员 PIN" />
-                    <Button onClick={() => { onSetPin(pin); alert("管理员 PIN 已更新"); }}><Save className="w-4 h-4 inline" /> 保存 PIN</Button>
+                    <Input
+                        value={newIp}
+                        onChange={(e) => setNewIp(e.target.value)}
+                        placeholder="输入新 IP 名称"
+                    />
+                    <Button onClick={addNewIp} className="bg-blue-500 text-white">添加</Button>
                 </div>
             </Card>
 
             <Card>
-                <h3 className="font-semibold mb-2">新建 / 编辑题目</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div>
-                        <label className="text-sm">IP 名称</label>
-                        <div className="relative">
-                            <select
-                                className="w-full px-3 py-2 border rounded-xl shadow-sm focus:outline-none focus:ring bg-white"
-                                value={form.ip}
-                                onChange={(e) => setForm({ ...form, ip: e.target.value })}
-                            >
-                                <option value="">选择 IP</option>
-                                {ips.map((ip) => (
-                                    <option key={ip} value={ip}>{ip}</option>
-                                ))}
-                            </select>
-                            <div className="mt-2">
-                                <Input
-                                    value={newIp}
-                                    onChange={(e) => setNewIp(e.target.value)}
-                                    placeholder="新 IP 名称"
-                                />
-                                <Button onClick={addNewIp} className="mt-2">添加</Button>
-                            </div>
-                        </div>
-                    </div>
-                    <div>
-                        <label className="text-sm">题目类型</label>
-                        <select
-                            className="w-full px-3 py-2 border rounded-xl shadow-sm focus:outline-none focus:ring bg-white"
-                            value={form.type}
-                            onChange={(e) => setForm({ ...form, type: e.target.value })}
-                        >
-                            {Object.entries(TYPE_LABELS).map(([key, label]) => (
-                                <option key={key} value={key}>{label}</option>
-                            ))}
-                        </select>
-                    </div>
-                    <div>
-                        <label className="text-sm">难度等级</label>
-                        <select
-                            className="w-full px-3 py-2 border rounded-xl shadow-sm focus:outline-none focus:ring bg-white"
-                            value={form.level}
-                            onChange={(e) => setForm({ ...form, level: e.target.value })}
-                        >
-                            <option value="a">A（3 分）</option>
-                            <option value="b">B（2 分）</option>
-                            <option value="c">C（1 分）</option>
-                            <option value="s">S（5 分）</option>
-                        </select>
-                    </div>
-                    <div className="md:col-span-2">
-                        <label className="text-sm">题干（支持 Markdown）</label>
-                        <Textarea value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
-                    </div>
-
-                    {form.type === "mcq" && (
-                        <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-3">
-                            {[0, 1, 2, 3].map((i) => (
-                                <div key={i} className="flex items-center gap-2">
-                                    <Tag tone="gray">{String.fromCharCode(65 + i)}</Tag>
-                                    <Input
-                                        value={form.options[i] || ""}
-                                        onChange={(e) => {
-                                            const arr = [...form.options];
-                                            arr[i] = e.target.value;
-                                            setForm({ ...form, options: arr });
-                                        }}
-                                    />
-                                </div>
-                            ))}
-                            <div className="md:col-span-2">
-                                <label className="text-sm">正确选项</label>
-                                <select
-                                    className="w-full px-3 py-2 border rounded-xl shadow-sm focus:outline-none focus:ring bg-white"
-                                    value={form.correctIndex}
-                                    onChange={(e) => setForm({ ...form, correctIndex: Number(e.target.value) })}
-                                >
-                                    {[0, 1, 2, 3].map((i) => (
-                                        <option key={i} value={i}>{String.fromCharCode(65 + i)}</option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
-                    )}
-
-                    {form.type !== "mcq" && (
-                        <div className="md:col-span-2">
-                            <label className="text-sm">参考答案（Markdown，可选）</label>
-                            <Textarea value={form.reference} onChange={(e) => setForm({ ...form, reference: e.target.value })} />
-                        </div>
-                    )}
-                </div>
-
-                <div className="mt-3 flex gap-2">
-                    <Button onClick={saveQuestion} className="bg-gray-900 text-white"><Save className="w-4 h-4 inline" /> 保存题目</Button>
-                    <Button onClick={resetForm}><RotateCcw className="w-4 h-4 inline" /> 重置表单</Button>
+                <h3 className="font-semibold mb-2">当前 IP 特殊提示</h3>
+                <div className="flex flex-col gap-2">
+                    <Textarea
+                        value={specialHint}
+                        onChange={(e) => setSpecialHint(e.target.value)}
+                        placeholder="输入当前 IP 的特殊提示"
+                        className="w-full px-3 py-2 border rounded-xl shadow-sm focus:outline-none focus:ring"
+                    />
+                    <Button onClick={saveSpecialHint} className="bg-blue-500 text-white">保存提示</Button>
                 </div>
             </Card>
 
             <Card>
-                <h3 className="font-semibold mb-2">题库（{questions.length}）</h3>
+                <div className="flex items-center justify-between mb-2">
+                    <h3 className="font-semibold">题库（{filteredQuestions.length}）</h3>
+                    <Button onClick={resetForm} className="bg-green-500 text-white">新建题目</Button>
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {questions.map((q) => (
-                        <div key={q.id} className="p-3 rounded-xl border">
+                    {filteredQuestions.map((q) => (
+                        <div key={q.id} className="p-3 rounded-xl border relative">
                             <div className="flex items-center gap-2 mb-1">
                                 <Tag tone="blue">{q.ip}</Tag>
                                 <Tag tone={LEVEL_COLORS[q.level]}>{LEVEL_LABEL[q.level]}</Tag>
@@ -772,6 +697,108 @@ function AdminArea({ questions, setQuestions, onSetPin }) {
                     ))}
                 </div>
             </Card>
+
+            {form && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                    <div className="relative bg-white p-4 shadow-lg border rounded-xl w-full max-w-2xl">
+                        <button
+                            className="absolute top-2 right-2 px-3 py-2 rounded-2xl shadow-sm border text-sm hover:shadow transition bg-gray-100 hover:bg-gray-200"
+                            onClick={() => setForm(null)}
+                        >
+                            关闭
+                        </button>
+                        <div className="prose prose-sm max-w-none">
+                            <h3 className="font-semibold">{form.id ? "编辑题目" : "新建题目"}</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <div>
+                                    <label className="text-sm">IP 名称</label>
+                                    <select
+                                        className="w-full px-3 py-2 border rounded-xl shadow-sm focus:outline-none focus:ring bg-white"
+                                        value={form.ip}
+                                        onChange={(e) => setForm({ ...form, ip: e.target.value })}
+                                    >
+                                        <option value="">选择 IP</option>
+                                        {Array.from(new Set(questions.map((q) => q.ip))).map((ip) => (
+                                            <option key={ip} value={ip}>{ip}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="text-sm">题目类型</label>
+                                    <select
+                                        className="w-full px-3 py-2 border rounded-xl shadow-sm focus:outline-none focus:ring bg-white"
+                                        value={form.type}
+                                        onChange={(e) => setForm({ ...form, type: e.target.value })}
+                                    >
+                                        {Object.entries(TYPE_LABELS).map(([key, label]) => (
+                                            <option key={key} value={key}>{label}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="text-sm">难度等级</label>
+                                    <select
+                                        className="w-full px-3 py-2 border rounded-xl shadow-sm focus:outline-none focus:ring bg-white"
+                                        value={form.level}
+                                        onChange={(e) => setForm({ ...form, level: e.target.value })}
+                                    >
+                                        <option value="a">A（3 分）</option>
+                                        <option value="b">B（2 分）</option>
+                                        <option value="c">C（1 分）</option>
+                                        <option value="s">S（5 分）</option>
+                                    </select>
+                                </div>
+                                <div className="md:col-span-2">
+                                    <label className="text-sm">题干（支持 Markdown）</label>
+                                    <Textarea value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
+                                </div>
+
+                                {form.type === "mcq" && (
+                                    <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-3">
+                                        {[0, 1, 2, 3].map((i) => (
+                                            <div key={i} className="flex items-center gap-2">
+                                                <Tag tone="gray">{String.fromCharCode(65 + i)}</Tag>
+                                                <Input
+                                                    value={form.options[i] || ""}
+                                                    onChange={(e) => {
+                                                        const arr = [...form.options];
+                                                        arr[i] = e.target.value;
+                                                        setForm({ ...form, options: arr });
+                                                    }}
+                                                />
+                                            </div>
+                                        ))}
+                                        <div className="md:col-span-2">
+                                            <label className="text-sm">正确选项</label>
+                                            <select
+                                                className="w-full px-3 py-2 border rounded-xl shadow-sm focus:outline-none focus:ring bg-white"
+                                                value={form.correctIndex}
+                                                onChange={(e) => setForm({ ...form, correctIndex: Number(e.target.value) })}
+                                            >
+                                                {[0, 1, 2, 3].map((i) => (
+                                                    <option key={i} value={i}>{String.fromCharCode(65 + i)}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {form.type !== "mcq" && (
+                                    <div className="md:col-span-2">
+                                        <label className="text-sm">参考答案（Markdown，可选）</label>
+                                        <Textarea value={form.reference} onChange={(e) => setForm({ ...form, reference: e.target.value })} />
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="mt-3 flex gap-2">
+                                <Button onClick={saveQuestion} className="bg-gray-900 text-white"><Save className="w-4 h-4 inline" /> 保存题目</Button>
+                                <Button onClick={() => setForm(null)}><RotateCcw className="w-4 h-4 inline" /> 取消</Button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
