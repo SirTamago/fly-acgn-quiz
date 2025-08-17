@@ -633,12 +633,14 @@ function AdminArea({ questions, setQuestions, onSetPin }) {
         }
     }
 
+    /*
     function deleteIp(ip) {
         setIps((prev) => prev.filter((i) => i !== ip));
         setQuestions((prev) => prev.filter((q) => q.ip !== ip));
         if (form.ip === ip) setForm((prev) => ({ ...prev, ip: "" }));
     }
-
+    */
+   
     return (
         <div className="space-y-4">
             <Card>
