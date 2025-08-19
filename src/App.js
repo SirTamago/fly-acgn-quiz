@@ -142,10 +142,6 @@ export default function App() {
     useEffect(() => {
         saveHints(hints);
     }, [hints]);
-    useEffect(() => {
-        // Clear hints from localStorage on page load
-        localStorage.removeItem(LS_HINTS);
-    }, []);
 
     const ips = useMemo(() => {
         const set = new Set(questions.map((q) => q.ip));
