@@ -18,7 +18,8 @@ import {
 } from "lucide-react";
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
-import { getQuestions, saveQuestions, saveHints } from "./dataSource";
+import questions from "./questions.json";
+import baseHints from "./hints.json";
 
 // --- Types ---
 /**
@@ -45,11 +46,30 @@ function uid() {
 }
 
 // --- LocalStorage helpers ---
+const LS_KEY = "ipquiz.questions.v1";
 const LS_HINTS = "ipquiz.hints.v1";
 const LS_PIN = "ipquiz.admin.pin";
-// Note: question/hint persistence is provided by `dataSource.js` which
-// exports `getQuestions`, `saveQuestions`, `getHints`, `saveHints`.
-// Keep admin PIN helpers here.
+
+function loadQuestions() {
+    return questions;
+}
+function saveQuestions(arr) {
+    localStorage.setItem(LS_KEY, JSON.stringify(arr));
+}
+function loadHints() {
+    try {
+        const s = localStorage.getItem(LS_HINTS);
+        if (s) {
+            const fromLS = JSON.parse(s);
+            // merge: file defaults + local overrides
+            return { ...(baseHints || {}), ...(fromLS || {}) };
+        }
+    } catch {}
+    return baseHints || {};
+}
+function saveHints(obj) {
+    localStorage.setItem(LS_HINTS, JSON.stringify(obj || {}));
+}
 function getAdminPin() {
     return localStorage.getItem(LS_PIN) || "1234"; // default pin
 }
@@ -107,22 +127,14 @@ function Tag({ children, tone = "gray" }) {
 // --- Main App ---
 export default function App() {
     const [tab, setTab] = useState("welcome"); // welcome | quiz | admin
-    const [questions, setQuestions] = useState([]);
-    const [hints, setHints] = useState({}); // { [ip: string]: string }
+    const [questions, setQuestions] = useState(() => loadQuestions());
+    const [hints, setHints] = useState(() => loadHints()); // { [ip: string]: string }
     const [selectedIP, setSelectedIP] = useState("");
     const [basket, setBasket] = useState([]); // selected question ids before start
     const [phase, setPhase] = useState("pick"); // pick | running | confirm | finished
     const [answers, setAnswers] = useState({}); // qid -> { type-specific }
     const [adminMode, setAdminMode] = useState(false);
     const [pinInput, setPinInput] = useState("");
-
-    useEffect(() => {
-        async function fetchQuestions() {
-            const data = await getQuestions();
-            setQuestions(data);
-        }
-        fetchQuestions();
-    }, []);
 
     useEffect(() => {
         saveQuestions(questions);
