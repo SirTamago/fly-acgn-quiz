@@ -866,7 +866,7 @@ function AdminArea({ questions, setQuestions, hints, setHints, selectedIP, ips }
         alert("管理员 PIN 码已更新！");
     }
 
-    // --- 导出功能 ---
+    // --- 导出题目功能 ---
     function exportQuestions() {
         const dataStr = JSON.stringify(questions, null, 2); // null, 2 for pretty print
         const blob = new Blob([dataStr], { type: "application/json" });
@@ -881,7 +881,7 @@ function AdminArea({ questions, setQuestions, hints, setHints, selectedIP, ips }
         alert("题库已导出！");
     }
 
-    // --- 导入功能 ---
+    // --- 导入题目功能 ---
     function importQuestions(event) {
         const file = event.target.files[0];
         if (!file) return;
@@ -912,6 +912,51 @@ function AdminArea({ questions, setQuestions, hints, setHints, selectedIP, ips }
         event.target.value = null;
     }
 
+    // --- 导出 hints 功能 ---
+    function exportHints() {
+        const dataStr = JSON.stringify(hints, null, 2);
+        const blob = new Blob([dataStr], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `ipquiz_hints_${new Date().toISOString().slice(0,10)}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        alert("提示数据已导出！");
+    }
+
+    // --- 导入 hints 功能 ---
+    function importHints(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const importedData = JSON.parse(e.target.result);
+                if (typeof importedData === 'object' && !Array.isArray(importedData)) { // Hints are an object, not an array
+                    if (window.confirm(`确定要导入提示数据吗？这将覆盖当前提示！`)) {
+                        setHints(importedData);
+                        alert("提示数据导入成功！");
+                    }
+                } else {
+                    alert("导入文件格式不正确，请确保是提示对象的 JSON 文件。");
+                }
+            } catch (error) {
+                alert("解析 JSON 文件失败，请检查文件内容是否正确。\n" + error.message);
+                console.error("Error parsing imported JSON:", error);
+            }
+        };
+        reader.onerror = (error) => {
+            alert("读取文件失败。");
+            console.error("Error reading file:", error);
+        };
+        reader.readAsText(file);
+        event.target.value = null;
+    }
+
 
     const filteredQuestions = useMemo(() => {
         const arr = selectedIP ? questions.filter((q) => q.ip === selectedIP) : questions;
@@ -922,16 +967,27 @@ function AdminArea({ questions, setQuestions, hints, setHints, selectedIP, ips }
         <div className="space-y-4 relative">
             <Card>
                 <h3 className="font-semibold mb-2">题库导入/导出</h3>
-                <div className="flex flex-col sm:flex-row items-center gap-3">
-                    <Button onClick={exportQuestions} className="bg-purple-600 text-white hover:bg-purple-700 w-full sm:w-auto">
-                        <Save className="w-4 h-4 inline mr-1" /> 导出当前题库
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4"> {/* Use grid for better layout */}
+                    <Button onClick={exportQuestions} className="bg-purple-600 text-white hover:bg-purple-700 w-full">
+                        <Save className="w-4 h-4 inline mr-1" /> 导出题目库
                     </Button>
-                    <label className="bg-green-600 text-white hover:bg-green-700 px-3 py-2 rounded-2xl shadow-sm border text-sm transition cursor-pointer w-full sm:w-auto text-center">
+                    <label className="bg-green-600 text-white hover:bg-green-700 px-3 py-2 rounded-2xl shadow-sm border text-sm transition cursor-pointer w-full text-center">
                         <input type="file" accept=".json" onChange={importQuestions} className="hidden" />
-                        <BookOpen className="w-4 h-4 inline mr-1" /> 导入题库文件
+                        <BookOpen className="w-4 h-4 inline mr-1" /> 导入题目库
                     </label>
                 </div>
-                <p className="text-sm text-gray-500 mt-2">导出可备份和分享，导入会覆盖当前题库。</p>
+
+                <h3 className="font-semibold mb-2">提示数据导入/导出</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3"> {/* New section for hints */}
+                    <Button onClick={exportHints} className="bg-blue-600 text-white hover:bg-blue-700 w-full">
+                        <Save className="w-4 h-4 inline mr-1" /> 导出提示数据
+                    </Button>
+                    <label className="bg-orange-600 text-white hover:bg-orange-700 px-3 py-2 rounded-2xl shadow-sm border text-sm transition cursor-pointer w-full text-center">
+                        <input type="file" accept=".json" onChange={importHints} className="hidden" />
+                        <BookOpen className="w-4 h-4 inline mr-1" /> 导入提示数据
+                    </label>
+                </div>
+                <p className="text-sm text-gray-500 mt-2">导出可备份和分享，导入会覆盖当前数据。</p>
             </Card>
 
             <Card>
