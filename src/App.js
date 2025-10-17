@@ -801,7 +801,7 @@ function AdminArea({ questions, setQuestions, hints, setHints, selectedIP, ips }
             // Filter out empty options before validation
             payload.options = payload.options.filter(o => o.trim() !== "");
             if (payload.options.length < 2) return alert("选择题至少需要两个选项。");
-            if (payload.options.some((o) => !o)) return alert("请填写完整选项。");
+            // if (payload.options.some((o) => !o)) return alert("请填写完整选项。"); // This check is redundant after filtering empty.
 
             if (!payload.correctIndices || payload.correctIndices.length === 0) {
                 return alert("请选择至少一个正确选项。");
@@ -858,6 +858,53 @@ function AdminArea({ questions, setQuestions, hints, setHints, selectedIP, ips }
         alert("管理员 PIN 码已更新！");
     }
 
+    // --- 导出功能 ---
+    function exportQuestions() {
+        const dataStr = JSON.stringify(questions, null, 2); // null, 2 for pretty print
+        const blob = new Blob([dataStr], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `ipquiz_questions_${new Date().toISOString().slice(0,10)}.json`; // e.g., ipquiz_questions_2023-10-27.json
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url); // Clean up
+        alert("题库已导出！");
+    }
+
+    // --- 导入功能 ---
+    function importQuestions(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const importedData = JSON.parse(e.target.result);
+                if (Array.isArray(importedData)) {
+                    if (window.confirm(`确定要导入 ${importedData.length} 道题目吗？这将覆盖当前题库！`)) {
+                        setQuestions(importedData);
+                        alert("题库导入成功！");
+                    }
+                } else {
+                    alert("导入文件格式不正确，请确保是题目数组的 JSON 文件。");
+                }
+            } catch (error) {
+                alert("解析 JSON 文件失败，请检查文件内容是否正确。\n" + error.message);
+                console.error("Error parsing imported JSON:", error);
+            }
+        };
+        reader.onerror = (error) => {
+            alert("读取文件失败。");
+            console.error("Error reading file:", error);
+        };
+        reader.readAsText(file); // Read the file as text
+        // Clear the input value so the same file can be selected again
+        event.target.value = null;
+    }
+
+
     const filteredQuestions = useMemo(() => {
         const arr = selectedIP ? questions.filter((q) => q.ip === selectedIP) : questions;
         return arr.filter((q) => q.type !== "info"); // Hide legacy info-type items
@@ -865,6 +912,20 @@ function AdminArea({ questions, setQuestions, hints, setHints, selectedIP, ips }
 
     return (
         <div className="space-y-4 relative">
+            <Card>
+                <h3 className="font-semibold mb-2">题库导入/导出</h3>
+                <div className="flex flex-col sm:flex-row items-center gap-3">
+                    <Button onClick={exportQuestions} className="bg-purple-600 text-white hover:bg-purple-700 w-full sm:w-auto">
+                        <Save className="w-4 h-4 inline mr-1" /> 导出当前题库
+                    </Button>
+                    <label className="bg-green-600 text-white hover:bg-green-700 px-3 py-2 rounded-2xl shadow-sm border text-sm transition cursor-pointer w-full sm:w-auto text-center">
+                        <input type="file" accept=".json" onChange={importQuestions} className="hidden" />
+                        <BookOpen className="w-4 h-4 inline mr-1" /> 导入题库文件
+                    </label>
+                </div>
+                <p className="text-sm text-gray-500 mt-2">导出可备份和分享，导入会覆盖当前题库。</p>
+            </Card>
+
             <Card>
                 <h3 className="font-semibold mb-2">添加/管理 IP 分类</h3>
                 <div className="flex items-center gap-2 mb-4">
