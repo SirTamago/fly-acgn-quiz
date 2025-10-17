@@ -658,7 +658,7 @@ function MCQBlock({ q, ans, setAns, showReference }) {
     // Quiz score logic (for UI feedback)
     const allCorrectChosen = correctIndices.every(cIdx => chosenIndices.includes(cIdx));
     const noIncorrectChosen = chosenIndices.every(cIdx => correctIndices.includes(cIdx));
-    const isFullyCorrect = allCorrectChosen && noIncorrectChosen && correctIndices.length === chosenIndices.length;
+    const isFullyCorrect = allCorrectChosen && noIncorrectChosen && correctIndices.length === chosenIndices.length; // THIS IS LINE 661
 
     return (
         <div className="space-y-2">
@@ -699,16 +699,30 @@ function MCQBlock({ q, ans, setAns, showReference }) {
             })}
             {(showReference || hasAnswered) && (
                 <div className="text-sm mt-1 p-2 rounded-lg bg-gray-50 border border-gray-200">
-                    正确答案：
-                    {correctIndices.length > 0 ? (
-                        correctIndices.map((idx, i) => (
-                            <Tag key={i} tone="green" className="mr-1">
-                                {String.fromCharCode(65 + idx)}
-                            </Tag>
-                        ))
-                    ) : (
-                        <Tag tone="gray">无</Tag> // Should not happen for MCQs
-                    )}
+                    <div className="flex items-center gap-2 mb-1"> {/* Add this div for overall correctness feedback */}
+                        正确答案：
+                        {correctIndices.length > 0 ? (
+                            correctIndices.map((idx, i) => (
+                                <Tag key={i} tone="green" className="mr-1">
+                                    {String.fromCharCode(65 + idx)}
+                                </Tag>
+                            ))
+                        ) : (
+                            <Tag tone="gray">无</Tag> // Should not happen for MCQs
+                        )}
+                        {hasAnswered && ( // Only show overall feedback if user has answered
+                            isFullyCorrect ? (
+                                <Tag tone="green" className="ml-auto flex items-center gap-1">
+                                    <CheckCircle2 className="w-3 h-3" /> 完全正确
+                                </Tag>
+                            ) : (
+                                <Tag tone="rose" className="ml-auto flex items-center gap-1">
+                                    <XCircle className="w-3 h-3" /> 部分或完全错误
+                                </Tag>
+                            )
+                        )}
+                    </div>
+
                     {showReference && q.reference && (
                         <div className="mt-2 text-gray-700">
                             <span className="font-medium">解释:</span>
