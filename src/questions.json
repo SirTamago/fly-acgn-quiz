@@ -1,75 +1,393 @@
 [
   {
     "id": "mcq-single-1",
-    "ip": "数学基础",
+    "ip": "动画基础知识",
     "type": "mcq",
-    "level": "b",
-    "title": "以下哪个数字是偶数？",
-    "options": ["1", "3", "5", "8"],
+    "level": "c",
+    "title": "在动画制作流程中，配音大多是在哪一制作环节完成后进行的？",
+    "options": ["A.Layout", "B.原画", "C.動画", "D.摄影"],
     "correctIndices": [3],
     "isMultiChoice": false,
-    "reference": "偶数是能被2整除的整数。"
-  },
-  {
-    "id": "mcq-multi-1",
-    "ip": "数学基础",
-    "type": "mcq",
-    "level": "a",
-    "title": "以下哪些数字是质数？(多选)",
-    "options": ["2", "4", "7", "9", "11"],
-    "correctIndices": [0, 2, 4],
-    "isMultiChoice": true,
-    "reference": "质数（或素数）是指在大于1的自然数中，除了1和它本身以外不再有其他因数的数。"
-  },
-  {
-    "id": "fill-1",
-    "ip": "编程入门",
-    "type": "fill",
-    "level": "c",
-    "title": "JavaScript中声明常量的关键字是____。",
-    "reference": "const"
-  },
-  {
-    "id": "short-1",
-    "ip": "编程入门",
-    "type": "short",
-    "level": "s",
-    "title": "请简述你对Web前端开发的理解。",
-    "reference": "Web前端开发是指使用HTML、CSS和JavaScript等技术，通过浏览器运行，为用户呈现交互界面的工作。它关注用户体验、界面设计和客户端逻辑实现。"
-  },
-  {
-    "id": "reading-1",
-    "ip": "历史文化",
-    "type": "reading",
-    "level": "b",
-    "title": "《论语》是儒家学派的经典著作之一，由孔子的弟子及其再传弟子编撰而成，主要记录了孔子及其弟子的言行。其中包含了丰富的哲学思想、道德观念和教育理念。\n\n问题：谁是《论语》的主要记录者？",
-    "reference": "孔子的弟子及其再传弟子"
+    "reference": "配音通常在摄影（合成）完成后，画面基本确定后进行。"
   },
   {
     "id": "mcq-single-2",
-    "ip": "IP-Demo",
+    "ip": "动画基础知识",
     "type": "mcq",
-    "level": "a",
-    "title": "这个测验的名称是？",
-    "options": ["IP Quiz", "Demo Quiz", "IP 主题测验 · Demo", "前端测验"],
+    "level": "c",
+    "title": "通常所谓的「一拍三」在作画中指的是每秒（  ）帧画面。",
+    "options": ["A.30", "B.24", "C.12", "D.8"],
+    "correctIndices": [3],
+    "isMultiChoice": false,
+    "reference": "「一拍三」意味着一秒钟播放8帧画面，每帧画面停留三拍。"
+  },
+  {
+    "id": "mcq-single-3",
+    "ip": "动画基础知识",
+    "type": "mcq",
+    "level": "c",
+    "title": "在原画阶段通常分为多个图层进行作画，对这些图层的合并在哪一制作环节中完成？",
+    "options": ["A.動画", "B.上色", "C.摄影", "D.V编"],
     "correctIndices": [2],
     "isMultiChoice": false,
-    "reference": "请看页面顶部的标题。"
+    "reference": "图层的合并通常在摄影（compositing）环节完成，即将所有绘制好的元素合成为最终画面。"
+  },
+  {
+    "id": "mcq-single-4",
+    "ip": "动画基础知识",
+    "type": "mcq",
+    "level": "a",
+    "title": "以方块形的爆炸碎片和黑白闪著称的动画师为（  ）",
+    "options": ["A.中村丰", "B.吉成曜", "C.森久司", "D.矶光雄"],
+    "correctIndices": [0],
+    "isMultiChoice": false,
+    "reference": "中村丰的动作和爆炸演出风格非常独特，常出现方块形碎片和画面闪动。"
+  },
+  {
+    "id": "mcq-single-5",
+    "ip": "动画基础知识",
+    "type": "mcq",
+    "level": "c",
+    "title": "动画界某些制作能力很强的制作团队被称为「xx班」。如MADHOUSE的「福士班」和CloverWorks的「梅原班」都曾为我们带来过多部动画精品。请问福士和梅原所担任的职位是（  ）",
+    "options": ["A.制作管理", "B.总制片人", "C.执行制片人", "D.动画制片人"],
+    "correctIndices": [3],
+    "isMultiChoice": false,
+    "reference": "福士和梅原通常指的是动画制片人（Animation Producer），负责统筹动画制作项目。"
+  },
+  {
+    "id": "mcq-single-6",
+    "ip": "动画基础知识",
+    "type": "mcq",
+    "level": "c",
+    "title": "有「圣战」之称的，是日本以至全球最大型的同人志即卖会的漫展是（  ）",
+    "options": ["A.ComicMarket", "B.BilibiliWorld", "C.COMICUP", "D.AnimeJapan"],
+    "correctIndices": [0],
+    "isMultiChoice": false,
+    "reference": "ComicMarket（Comiket）是全球最大型的同人志即卖会。"
+  },
+  {
+    "id": "mcq-single-7",
+    "ip": "动画基础知识",
+    "type": "mcq",
+    "level": "c",
+    "title": "2021年，动画《赛马娘 Pretty Derby Season 2》斩获19万以上的累计销量，问鼎本世纪动画销量榜首。在此之前，以在BD中封入「角色评论音轨」作为开创性卖点的本世纪销量榜首动画是（  ）",
+    "options": ["A.魔法少女小圆", "B.机动战士高达SEED", "C.化物语", "D.凉宫春日的忧郁"],
+    "correctIndices": [2],
+    "isMultiChoice": false,
+    "reference": "《化物语》在BD中封入「角色评论音轨」是其开创性卖点之一，并取得了巨大的销量成功。"
+  },
+  {
+    "id": "mcq-single-8",
+    "ip": "动画基础知识",
+    "type": "mcq",
+    "level": "c",
+    "title": "以下哪一选项比较符合通常日本动画的单集制作成本（  ）",
+    "options": ["A.30万日元（约1.5万人民币）", "B.300万日元（约15万人民币）", "C.3000万日元（约150万人民币)", "D.3亿日元（约1500万人民币）"],
+    "correctIndices": [1],
+    "isMultiChoice": false,
+    "reference": "通常日本TV动画单集制作成本在1000万至2000万日元左右，300万日元（约15万人民币）是较为保守的估算。"
+  },
+  {
+    "id": "mcq-single-9",
+    "ip": "动画基础知识",
+    "type": "mcq",
+    "level": "c",
+    "title": "以下哪一动画制作公司不在东京圈（  ）",
+    "options": ["A. P.A.Works", "B.A-1 Picture", "C.WIT STUDIO", "D.TRIGGER"],
+    "correctIndices": [0],
+    "isMultiChoice": false,
+    "reference": "P.A.Works总部位于富山县，不在东京圈。A-1 Picture、WIT STUDIO和TRIGGER都在东京或东京附近。"
+  },
+  {
+    "id": "mcq-single-10",
+    "ip": "动画基础知识",
+    "type": "mcq",
+    "level": "c",
+    "title": "以下哪部动画不属于国内所谓「三大民工漫」（  ）",
+    "options": ["A.火影忍者", "B.BLEACH", "C.ONE PIECE", "D.名侦探柯南"],
+    "correctIndices": [3],
+    "isMultiChoice": false,
+    "reference": "「三大民工漫」通常指的是《火影忍者》、《BLEACH》和《ONE PIECE》。"
+  },
+  {
+    "id": "mcq-single-11",
+    "ip": "动画基础知识",
+    "type": "mcq",
+    "level": "a",
+    "title": "首次在日本动画中，在分镜后加入Layout工序的动画导演是（  ）",
+    "options": ["A.手冢治虫", "B.宫崎骏", "C.押井守", "D.富野由悠季"],
+    "correctIndices": [1],
+    "isMultiChoice": false,
+    "reference": "宫崎骏在《未来少年柯南》中引入了Layout工序。"
+  },
+  {
+    "id": "mcq-single-12",
+    "ip": "动画基础知识",
+    "type": "mcq",
+    "level": "a",
+    "title": "首个明确采用「制作委员会」制度的原创TV动画是（  ）",
+    "options": ["A.宇宙战舰大和号(1974)", "B. 机动战士高达(1979)", "C.超时空要塞(1982)", "D.新世纪福音战士(1995)"],
+    "correctIndices": [2],
+    "isMultiChoice": false,
+    "reference": "《超时空要塞》是首个明确采用「制作委员会」制度的原创TV动画。"
+  },
+  {
+    "id": "mcq-single-13",
+    "ip": "动画基础知识",
+    "type": "mcq",
+    "level": "c",
+    "title": "在执导某部动画中途被撤换，被公司认为「还没有达到胜任导演这一职位的领域」从而至今为动画社区笑谈的导演是（  ）",
+    "options": ["A.石立太一", "B.中山龙", "C.元永庆太郎", "D.山本宽"],
+    "correctIndices": [3],
+    "isMultiChoice": false,
+    "reference": "山本宽在《幸运星》制作中途被撤换，官方理由是他“还没有达到胜任导演这一职位的领域”。"
+  },
+  {
+    "id": "mcq-single-14",
+    "ip": "动画基础知识",
+    "type": "mcq",
+    "level": "a",
+    "title": "下列哪一导演不是出自传奇动画公司GAINAX（  ）",
+    "options": ["A.庵野秀明", "B.新房昭之", "C.今石洋之", "D.鹤卷和哉"],
+    "correctIndices": [1],
+    "isMultiChoice": false,
+    "reference": "新房昭之主要活跃于SHAFT等公司，并非GAINAX出身的导演。庵野秀明、今石洋之和鹤卷和哉都与GAINAX有深厚渊源。"
+  },
+  {
+    "id": "mcq-single-15",
+    "ip": "动画基础知识",
+    "type": "mcq",
+    "level": "c",
+    "title": "由于在制作和策划过程中出现了诸多问题和纠纷，而在动画中“倾注了导演的恶意”的恶性事件是哪部动画（  ）",
+    "options": ["A.兽娘动物园2", "B.迷家", "C.魔法战争", "D.偶像大师闪耀色彩"],
+    "correctIndices": [0],
+    "isMultiChoice": false,
+    "reference": "《兽娘动物园2》在制作过程中引发了巨大的争议和纠纷，被指责为“倾注了导演的恶意”。"
+  },
+  {
+    "id": "mcq-single-16",
+    "ip": "动画基础知识",
+    "type": "mcq",
+    "level": "c",
+    "title": "B站很早就有动画杂谈区「三幻神」的说法，指代动画杂谈区最出名的三位或四位up主。而相应地，动画杂谈区「里三幻神」的说法也广为流传，下列哪位up不属于「里三幻神」：（  ）",
+    "options": ["A.中二电波台", "B.赫萝老师", "C.JK低手鱼太", "D.动画魂-Anitama"],
+    "correctIndices": [3],
+    "isMultiChoice": false,
+    "reference": "动画魂-Anitama是一个动画媒体，而非个人UP主，且其定位与「里三幻神」的UP主有所不同。"
+  },
+  {
+    "id": "mcq-single-17",
+    "ip": "动画基础知识",
+    "type": "mcq",
+    "level": "c",
+    "title": "下列哪一角色不属于「校园四霸」（  ）",
+    "options": ["A.绫小路清隆", "B.阿良良木历", "C.梓川咲太", "D.折木奉太郎"],
+    "correctIndices": [1],
+    "isMultiChoice": false,
+    "reference": "「校园四霸」通常指绫小路清隆、梓川咲太、折木奉太郎和比企谷八幡。阿良良木历是《物语系列》的角色。"
+  },
+  {
+    "id": "mcq-single-18",
+    "ip": "动画基础知识",
+    "type": "mcq",
+    "level": "c",
+    "title": "下列哪一选项不是字幕组（  ）",
+    "options": ["A.SweetSub", "B.喵萌奶茶屋", "C.LoliHouse", "D.雪飘工作室"],
+    "correctIndices": [2],
+    "isMultiChoice": false,
+    "reference": "LoliHouse是一个发布盗版资源的平台，而不是制作字幕的字幕组。SweetSub、喵萌奶茶屋和雪飘工作室都是知名的字幕组。"
+  },
+  {
+    "id": "mcq-single-19",
+    "ip": "动画基础知识",
+    "type": "mcq",
+    "level": "c",
+    "title": "下列哪部大热作品没有在原作完结时引发巨大争议（  ）",
+    "options": ["A.鬼灭之刃", "B.进击的巨人", "C.咒术回战", "D.我推的孩子"],
+    "correctIndices": [0],
+    "isMultiChoice": false,
+    "reference": "《鬼灭之刃》原作完结时虽然有些不舍，但并未引发巨大的争议。而《进击的巨人》、《咒术回战》和《我推的孩子》都在原作完结（或进展到关键高潮）时引发了广泛的争议。"
+  },
+  {
+    "id": "mcq-single-20",
+    "ip": "动画基础知识",
+    "type": "mcq",
+    "level": "c",
+    "title": "原创动画以「无法预知的命运舞台」长期以来成为新番讨论的焦点，下列哪部原创动画不属于「 高开低走」（  ）",
+    "options": ["A.成神之日", "B.罪恶王冠", "C.莉可莉丝", "D.BanG Dream! Ave Mujica"],
+    "correctIndices": [3],
+    "isMultiChoice": false,
+    "reference": "《成神之日》和《罪恶王冠》常被认为是「高开低走」的原创动画。《莉可莉丝》虽然结局有争议但整体评价较高。而《BanG Dream! Ave Mujica》是近期的新作，目前口碑较好，不属于「高开低走」。"
+  },
+  {
+    "id": "mcq-single-21",
+    "ip": "动画基础知识",
+    "type": "mcq",
+    "level": "s",
+    "title": "(附加题)作画监督修正纸的颜色是（  ）",
+    "options": ["A.蓝色", "B.黄色", "C.绿色", "D.橙色"],
+    "correctIndices": [2],
+    "isMultiChoice": false,
+    "reference": "作画监督修正通常使用绿色铅笔进行。"
+  },
+  {
+    "id": "fill-1",
+    "ip": "动画基础知识",
+    "type": "fill",
+    "level": "a",
+    "title": "TV动画《辉夜大小姐想让我告白》第一季ep3的特殊ed曾爆红视频平台，被称为书记舞。其流畅的作画得益于一种特殊的作画技法，该技法也曾因在动画《恶之华》中全篇使用而得到褒贬不一的评价。该技法被称为为          ",
+    "reference": "转描（Rotoscoping）"
   },
   {
     "id": "fill-2",
-    "ip": "IP-Demo",
+    "ip": "动画基础知识",
     "type": "fill",
     "level": "c",
-    "title": "本项目所使用的UI框架是____。",
-    "reference": "Tailwind CSS"
+    "title": "在表记上被标记制作「制作协力」，作为分包方的公司被称为「下请公司」；被标记为「动画制作」，作为总包方的公司被称为          ",
+    "reference": "元请公司"
   },
   {
-    "id": "short-2",
-    "ip": "IP-Demo",
-    "type": "short",
-    "level": "b",
-    "title": "你认为该程序有哪些可以改进的地方？",
-    "reference": "可能的改进点：增加用户认证、更好的错误处理、更丰富的题型（如图片题）、实时协作等。"
+    "id": "fill-3",
+    "ip": "动画基础知识",
+    "type": "fill",
+    "level": "c",
+    "title": "轻改动画中，轻小说插画师一般在动画表记中被标记为          ",
+    "reference": "角色原案"
+  },
+  {
+    "id": "fill-4",
+    "ip": "动画基础知识",
+    "type": "fill",
+    "level": "c",
+    "title": "由手冢治虫在日本动画中推广，在动画中将素材或画面片段多次重复使用的技术被称为           ",
+    "reference": "有限动画"
+  },
+  {
+    "id": "fill-5",
+    "ip": "动画基础知识",
+    "type": "fill",
+    "level": "c",
+    "title": "在单集动画中将分镜呈现为动画最终效果的职位是          ",
+    "reference": "演出"
+  },
+  {
+    "id": "fill-6",
+    "ip": "动画基础知识",
+    "type": "fill",
+    "level": "c",
+    "title": "我们所讨论的多数一般受众为高中及以上年龄群体的日本动画，根据电视台播放时间分类被称为        ",
+    "reference": "深夜动画"
+  },
+  {
+    "id": "fill-7",
+    "ip": "动画基础知识",
+    "type": "fill",
+    "level": "c",
+    "title": "「卖歌番」指的是          ",
+    "reference": "以歌曲为主要卖点和驱动力的动画作品"
+  },
+  {
+    "id": "fill-8",
+    "ip": "动画基础知识",
+    "type": "fill",
+    "level": "c",
+    "title": "既存在动画角色，角色CV也在现实中展开相应活动的企划被称为          ",
+    "reference": "2.5次元企划"
+  },
+  {
+    "id": "fill-9",
+    "ip": "动画基础知识",
+    "type": "fill",
+    "level": "c",
+    "title": "通过DVD，蓝光光盘等影碟单独发行的方式为主的动画剧集，或一些相较原著篇幅较小且内容不一的动画剧集被称为          ",
+    "reference": "OVA"
+  },
+  {
+    "id": "fill-10",
+    "ip": "动画基础知识",
+    "type": "fill",
+    "level": "c",
+    "title": "场贩周边意味着该周边                    ",
+    "reference": "只能在特定线下活动或展会现场购买的周边产品"
+  },
+  {
+    "id": "fill-11",
+    "ip": "动画基础知识",
+    "type": "fill",
+    "level": "a",
+    "title": "1981年，为宣传《机动战士高达》剧场版，SUNRISE公司在新宿车站东口广场发起一场粉丝集会，在该集会上由粉丝代表发表的宣言被认为是日本动画产业从子供向走向大众化的重要里程碑。该宣言名为          ",
+    "reference": "动画新世纪宣言"
+  },
+  {
+    "id": "fill-12",
+    "ip": "动画基础知识",
+    "type": "fill",
+    "level": "a",
+    "title": "上世纪80年代正值日本动画制作的黄金时期，然而80年代末的一起极其恶劣的犯罪事件被认为和御宅文化有关，从而给动画业界带来了巨大的打击。此后青年向动画急剧衰落，TV动画市场则长期主要由子供向动画占据，直到1995年《EVA》出现。该事件被称为          ",
+    "reference": "宫崎勤事件（御宅族犯罪事件）"
+  },
+  {
+    "id": "fill-13",
+    "ip": "动画基础知识",
+    "type": "fill",
+    "level": "c",
+    "title": "在日本动画转向部分电脑制作之前，主要在一种塑料胶片上进行作画上色，用这种胶片制作的动画被称为          ",
+    "reference": "赛璐珞动画"
+  },
+  {
+    "id": "fill-14",
+    "ip": "动画基础知识",
+    "type": "fill",
+    "level": "a",
+    "title": "传奇制作人丸山正雄与动画大师今敏的友情为人所称道。丸山正雄于2011年离开MADHOUSE创立MAPPA，为完成老友的遗作          ",
+    "reference": "《造梦机器》"
+  },
+  {
+    "id": "fill-15",
+    "ip": "动画基础知识",
+    "type": "fill",
+    "level": "c",
+    "title": "如果说《日常》销量的惨淡是京都动画的第一个转折点，让京都动画走向了更加商业化更少实验性的道路。那么发生于2019年的重大事件则成为京都动画的第二个转折点，此后京都动画元气大伤，不得不进入极为漫长的恢复期。该事件为          ",
+    "reference": "京都动画纵火案"
+  },
+  {
+    "id": "fill-16",
+    "ip": "动画基础知识",
+    "type": "fill",
+    "level": "c",
+    "title": "2016年，B站因在部分新番前加入广告引发了巨大争议。时任董事长兼CEO陈睿于次年在问答平台知乎回应了这一争议，该回答的最后一句话成为名句，至今仍时不时被拿出来调侃，该名言为                     ",
+    "reference": "“B站可能会倒闭，但绝不会变质”"
+  },
+  {
+    "id": "fill-17",
+    "ip": "动画基础知识",
+    "type": "fill",
+    "level": "c",
+    "title": "尽管很早国内就有针对动画推行「先审后播」政策的趋势，但是2021年某位当时知名的动画区up在直播时发表的有关当时B站热播的某部动的不当言论，以及其后引发的一系列事件无疑提前宣告了「先审后播」时代的到来。此事件对国内动画社区影响极为深远。该动画为          ",
+    "reference": "《无职转生》"
+  },
+  {
+    "id": "fill-18",
+    "ip": "动画基础知识",
+    "type": "fill",
+    "level": "c",
+    "title": "真名为牛子豪的up主是          ",
+    "reference": "LexBurner"
+  },
+  {
+    "id": "fill-19",
+    "ip": "动画基础知识",
+    "type": "fill",
+    "level": "c",
+    "title": "今年7月，「B萌」时隔6年重新举办的消息让大家重新关注起「萌战」这一二次元社区历史悠久的传统活动。其中，当前参与范围最广的萌战「世萌」的中文全称为          ",
+    "reference": "国际最萌大会"
+  },
+  {
+    "id": "fill-20",
+    "ip": "动画基础知识",
+    "type": "fill",
+    "level": "c",
+    "title": "B站以前的动画在OP结束后经常能看到的弹幕「从左到右，从未失手」指的是",
+    "reference": "番剧时间轴上的角色介绍弹幕"
   }
 ]
