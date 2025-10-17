@@ -429,6 +429,8 @@ function Welcome() {
     );
 }
 
+// ... (previous imports)
+
 function QuizArea({
                       questions,
                       hints,
@@ -498,7 +500,13 @@ function QuizArea({
             {specialHint && (
                 <div className="p-3 bg-yellow-100 border border-yellow-300 rounded-lg">
                     <h4 className="font-semibold text-yellow-800">提示</h4>
-                    <p className="text-yellow-700 whitespace-pre-line">{specialHint}</p>
+                    <div className="prose prose-sm max-w-none text-yellow-700"> {/* ADDED THIS WRAPPER */}
+                        <ReactMarkdown
+                            remarkPlugins={[remarkGfm]}
+                            rehypePlugins={[rehypeRaw]}
+                            children={specialHint}
+                        />
+                    </div> {/* END ADDED WRAPPER */}
                 </div>
             )}
 
