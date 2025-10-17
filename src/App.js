@@ -265,12 +265,13 @@ export default function App() {
     }, [answers, basket, questions]);
 
 
-    function revealReferences() {
-        setPhase("confirm");
-        window.scrollTo({ top: 0, behavior: "smooth" });
-    }
+    // function revealReferences() {
+    //     setPhase("confirm");
+    //     window.scrollTo({ top: 0, behavior: "smooth" });
+    // }
 
     function finishAndShowScore() {
+        // 确保从 running 阶段直接跳转到 finished 阶段
         setPhase("finished");
         window.scrollTo({ top: 0, behavior: "smooth" });
     }
@@ -344,12 +345,7 @@ export default function App() {
                                         <RotateCcw className="w-4 h-4 inline -mt-0.5" /> 重置
                                     </Button>
                                 )}
-                                {phase === "running" && (
-                                    <Button className="w-full bg-orange-500 text-white hover:bg-orange-600" onClick={revealReferences}>
-                                        <Eye className="w-4 h-4 inline -mt-0.5" /> 显示参考答案（非选择题）
-                                    </Button>
-                                )}
-                                {phase === "confirm" && (
+                                {phase === "running" && ( // 只有在 running 阶段可以完成并查看总分
                                     <Button className="w-full bg-green-500 text-white hover:bg-green-600" onClick={finishAndShowScore}>
                                         <ListChecks className="w-4 h-4 inline -mt-0.5" /> 完成并查看总分
                                     </Button>
@@ -594,7 +590,13 @@ function QuizArea({
                                     ))
                                 ) : (
                                     // Interactive options during the 'running', 'confirm', 'finished' phase
-                                    <MCQBlock q={q} ans={answers[q.id]} setAns={(data) => setAnswer(q.id, data)} showReference={phase === "confirm" || phase === "finished"} />
+                                    <MCQBlock
+                                        q={q}
+                                        ans={answers[q.id]}
+                                        setAns={(data) => setAnswer(q.id, data)}
+                                        // MCQs 的参考答案在 finished 阶段也应该显示
+                                        showReference={phase === "finished"}
+                                    />
                                 )}
                             </div>
                         )}
@@ -605,8 +607,9 @@ function QuizArea({
                                     q={q}
                                     ans={answers[q.id]}
                                     setAns={(data) => setAnswer(q.id, data)}
-                                    showReference={phase === "confirm" || phase === "finished"}
-                                    adminMode={adminMode} // Pass adminMode for grading
+                                    // ManualBlock 将自行管理其参考答案显示状态，但在 finished 阶段强制显示
+                                    forceShowReference={phase === "finished"}
+                                    adminMode={adminMode}
                                 />
                             </div>
                         )}
@@ -737,41 +740,73 @@ function MCQBlock({ q, ans, setAns, showReference }) {
     );
 }
 
-function ManualBlock({ q, ans, setAns, showReference, adminMode }) {
+// --- App.js (部分) ---
+// ...
+
+function ManualBlock({ q, ans, setAns, forceShowReference, adminMode }) {
     const maxPoints = LEVEL_POINTS[q.level];
     const manualScore = ans?.manualScore; // Current score given by admin
 
-    // Define scoring options based on question type
-    // Fill-in-the-blank might be all or nothing, or partial. Let's make it flexible.
+    // 内部状态，控制当前题目的参考答案显示
+    const [localShowReference, setLocalShowReference] = useState(false);
+
+    // 确保在 forceShowReference 变为 true 时，也更新 localShowReference
+    useEffect(() => {
+        if (forceShowReference) {
+            setLocalShowReference(true);
+        }
+    }, [forceShowReference]);
+
+    // 定义评分选项
     const choices = Array.from({ length: maxPoints + 1 }, (_, i) => i); // 0 to maxPoints
 
-    const canGrade = adminMode && !showReference; // Admin can grade only before references are shown
+    // 管理员只有在 adminMode 开启 且 参考答案已显示（或强制显示）时才能打分
+    // 如果没有显示参考答案就不能打分
+    const canGrade = adminMode && (localShowReference || forceShowReference);
 
     return (
         <div className="space-y-2">
-            {!adminMode && <div className="text-sm text-gray-600">此题需管理员评分。</div>}
-            {adminMode && (
-                <div className="flex gap-2 items-center">
-                    <span className="text-sm font-medium">评分 ({maxPoints} 分):</span>
-                    {choices.map((p) => (
-                        <Button
-                            key={p}
-                            onClick={() => setAns({ manualScore: p })}
-                            className={`${manualScore === p ? "bg-blue-600 text-white" : "bg-gray-100 hover:bg-gray-200"}`}
-                            disabled={!canGrade}
-                        >
-                            {p} 分
-                        </Button>
-                    ))}
-                </div>
+            {!adminMode && (
+                <div className="text-sm text-gray-600">此题需管理员评分。</div>
             )}
-            {!adminMode && manualScore !== undefined && (
+
+            {adminMode && ( // 管理员UI
+                <>
+                    <div className="flex gap-2 items-center justify-between mb-2">
+                        <Button
+                            onClick={() => setLocalShowReference(prev => !prev)}
+                            className={`bg-gray-100 text-gray-700 hover:bg-gray-200 ${localShowReference ? 'border-blue-300 text-blue-700' : ''}`}
+                            disabled={forceShowReference} // 在 finished 阶段禁用切换按钮
+                        >
+                            <Eye className="w-4 h-4 inline mr-1" />
+                            {localShowReference ? "隐藏参考答案" : "显示参考答案"}
+                        </Button>
+                        <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium">评分 ({maxPoints} 分):</span>
+                            {choices.map((p) => (
+                                <Button
+                                    key={p}
+                                    onClick={() => setAns({ manualScore: p })}
+                                    className={`${manualScore === p ? "bg-blue-600 text-white" : "bg-gray-100 hover:bg-gray-200"}`}
+                                    disabled={!canGrade} // 只有在允许打分时才启用按钮
+                                >
+                                    {p} 分
+                                </Button>
+                            ))}
+                        </div>
+                    </div>
+                </>
+            )}
+
+            {/* 无论是否管理员模式，只要有分数，就显示得分 */}
+            {manualScore !== undefined && (
                 <div className="text-sm text-gray-700">
                     你的得分：<Tag tone="blue">{manualScore}</Tag> 分
                 </div>
             )}
 
-            {(showReference || adminMode) && q.reference && ( // Admin can always see reference
+            {/* 参考答案显示，受 localShowReference 或 forceShowReference 控制 */}
+            {(localShowReference || forceShowReference) && q.reference && (
                 <div className="mt-2 p-3 rounded-xl bg-amber-50 border border-amber-300 text-sm text-amber-900">
                     <div className="font-medium mb-1">参考答案</div>
                     <div className="prose prose-sm max-w-none">
@@ -782,6 +817,8 @@ function ManualBlock({ q, ans, setAns, showReference, adminMode }) {
         </div>
     );
 }
+
+// ...
 
 function AdminArea({ questions, setQuestions, hints, setHints, selectedIP, ips }) {
     const [form, setForm] = useState(null); // null indicates no editing
