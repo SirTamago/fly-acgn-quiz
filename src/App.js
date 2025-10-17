@@ -18,6 +18,7 @@ import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import initialQuestions from "./questions.json"; // Changed import name
 import baseHints from "./hints.json";
+import { pinyin } from 'pinyin-pro'; // 在文件顶部引入
 
 // --- Types ---
 /**
@@ -156,8 +157,30 @@ export default function App() {
     // Use a Set for unique IPs, then convert to Array and sort
     const ips = useMemo(() => {
         const ipSet = new Set(questions.map((q) => q.ip));
-        Object.keys(hints || {}).forEach((ip) => ipSet.add(ip)); // Include IPs from hints
-        return Array.from(ipSet).sort();
+        Object.keys(hints || {}).forEach((ip) => ipSet.add(ip));
+
+        const allIPs = Array.from(ipSet);
+        const chineseRegex = /^[\u4e00-\u9fa5]/;
+
+        // 创建一个函数来获取用于排序的“键”
+        const getSortKey = (ip) => {
+            if (chineseRegex.test(ip)) {
+                // 如果是中文开头，转换为拼音，并去掉空格
+                return pinyin(ip, { toneType: 'none' }).replace(/\s/g, '');
+            }
+            // 否则直接返回小写的 IP
+            return ip.toLowerCase();
+        };
+
+        // 使用我们自定义的排序键进行排序
+        allIPs.sort((a, b) => {
+            const keyA = getSortKey(a);
+            const keyB = getSortKey(b);
+            return keyA.localeCompare(keyB, 'en-US');
+        });
+
+        return allIPs;
+
     }, [questions, hints]);
 
     const perIPCounts = useMemo(() => {
@@ -419,7 +442,6 @@ function Welcome() {
                 <li>选择题：包括单选和多选。选中后立即判分与显示正确答案。</li>
                 <li>填空 / 简答 / 阅读：仅管理员可在现场选择分数；确认环节可显示参考答案。</li>
                 <li>分值：A=3 分，B=2 分，C=1 分，S=5 分。</li>
-                <li>管理员 PIN 默认为：`1234`。</li>
             </ul>
         </Card>
     );
