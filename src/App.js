@@ -80,7 +80,7 @@ function saveHints(obj) {
     localStorage.setItem(LS_HINTS, JSON.stringify(obj || {}));
 }
 function getAdminPin() {
-    return localStorage.getItem(LS_PIN) || "1234"; // default pin
+    return localStorage.getItem(LS_PIN) || "flycomic"; // default pin
 }
 function setAdminPin(pin) {
     localStorage.setItem(LS_PIN, pin);
