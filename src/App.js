@@ -16,8 +16,8 @@ import {
 } from "lucide-react";
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
-import initialQuestions from "./questions.json"; // Changed import name
-import baseHints from "./hints.json";
+import initialQuestions from "./question.json"; // Changed import name
+import baseHints from "./hint.json";
 import { pinyin } from 'pinyin-pro'; // 在文件顶部引入
 
 // --- Types ---
